@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp */
 import React from 'react';
 
 const wTCDmock = jest.fn(() => () => {});
@@ -8,7 +7,6 @@ const tEMDmock = jest.fn(() => () => {});
 jest.setMock('../trackEventMethodDecorator', tEMDmock);
 
 describe('tracking HoC', () => {
-  // eslint-disable-next-line global-require
   const trackingHoC = require('../trackingHoC').default;
 
   it('detects a class', () => {
@@ -16,9 +14,9 @@ describe('tracking HoC', () => {
     const options = {};
 
     @trackingHoC(testClass, options)
-    class TestClass extends React.Component {} // eslint-disable-line
+    class TestClass extends React.Component {}
 
-    new TestClass(); // eslint-disable-line no-new
+    new TestClass();
 
     expect(wTCDmock).toHaveBeenCalledWith(testClass, options);
   });

@@ -1,12 +1,10 @@
-/* eslint-disable react/destructuring-assignment,react/prop-types,react/jsx-props-no-spreading */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 const mockDispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', mockDispatchTrackingEvent);
 
 describe('withTrackingComponentDecorator', () => {
-  // eslint-disable-next-line global-require
   const withTrackingComponentDecorator =
     require('../withTrackingComponentDecorator').default;
 

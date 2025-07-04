@@ -1,7 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
-/* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext, useEffect, useState } from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
@@ -14,7 +10,6 @@ const dispatch = jest.fn();
 const testState = { booleanState: true };
 
 describe('hooks', () => {
-  // eslint-disable-next-line global-require
   const { default: track, useTracking } = require('..');
 
   beforeEach(() => {
@@ -695,8 +690,7 @@ describe('hooks', () => {
     const trackRenders = jest.fn();
 
     function App() {
-      // eslint-disable-next-line no-unused-vars
-      const [clickCount, setClickCount] = useState(0);
+      const [, setClickCount] = useState(0);
 
       useEffect(() => {
         // use mock function to ensure that we are counting renders, not clicks
@@ -861,7 +855,7 @@ describe('hooks', () => {
   });
 
   it('root context items are accessible to children', () => {
-    const ReactTrackingContext = require('../ReactTrackingContext').default; // eslint-disable-line global-require
+    const ReactTrackingContext = require('../ReactTrackingContext').default;
 
     function Child() {
       const trackingContext = useContext(ReactTrackingContext);

@@ -1,7 +1,5 @@
 // @ts-check
-/* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
-/* eslint-disable jsx-a11y/control-has-associated-label */
-/* eslint-disable global-require */
+
 import React, { useContext } from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
@@ -484,7 +482,7 @@ const runTests = useBuiltLib => {
       constructor() {
         super();
         this.state = {
-          booleanState: true, // eslint-disable-line react/no-unused-state
+          booleanState: true,
         };
       }
 
@@ -592,7 +590,7 @@ const runTests = useBuiltLib => {
       handleClick = jest.fn();
 
       render() {
-        return <span onClick={this.handleClick}>Click Me</span>; // eslint-disable-line
+        return <span onClick={this.handleClick}>Click Me</span>;
       }
     }
 
@@ -802,7 +800,7 @@ const runTests = useBuiltLib => {
       }
 
       @track(
-        (props, state, methodArgs, [{ value }, err]) =>
+        (props, state, methodArgs, [, err]) =>
           err && {
             label: 'async action',
             status: 'failed',

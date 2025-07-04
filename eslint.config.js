@@ -4,6 +4,7 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import prettierPlugin from 'eslint-plugin-prettier';
+import globals from 'globals';
 
 export default [
   js.configs.recommended,
@@ -14,8 +15,8 @@ export default [
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
-        window: true,
-        document: true,
+        ...globals.browser,
+        ...globals.node,
       },
       parserOptions: {
         ecmaFeatures: { jsx: true },
@@ -30,6 +31,8 @@ export default [
     },
     rules: {
       'prettier/prettier': 'error',
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
@@ -40,12 +43,13 @@ export default [
       },
     },
   },
-  // Add this override for Jest test files:
+  // Jest override (still needed for test globals)
   {
     files: ['**/*.test.js', '**/__tests__/**/*.js'],
     languageOptions: {
       globals: {
-        ...js.environments.jest.globals,
+        ...globals.jest,
+        ...globals.node, // for require/global in tests
       },
     },
   },

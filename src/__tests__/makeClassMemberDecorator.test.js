@@ -13,7 +13,6 @@ describe('makeClassMemberDecorator', () => {
     const thingSpy = jest.fn();
     class Test {
       @makeClassMemberDecorator(mockDecorator)
-      // eslint-disable-next-line class-methods-use-this
       thing() {
         thingSpy();
       }

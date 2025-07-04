@@ -72,7 +72,6 @@ export default function useTrackingImpl(trackingData, options) {
     const getTrackingData = getTrackingDataFn();
 
     if (contextProcess && process) {
-      // eslint-disable-next-line
       console.error(
         '[react-tracking] options.process should be defined once on a top-level component'
       );
