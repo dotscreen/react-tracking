@@ -10,13 +10,12 @@ export default [
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
-      parser: babelParser, // <<--- IMPORTED PARSER MODULE, NOT STRING
+      parser: babelParser,
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
         window: true,
         document: true,
-        // add other globals as needed
       },
       parserOptions: {
         ecmaFeatures: { jsx: true },
@@ -38,6 +37,15 @@ export default [
     settings: {
       react: {
         version: 'detect',
+      },
+    },
+  },
+  // Add this override for Jest test files:
+  {
+    files: ['**/*.test.js', '**/__tests__/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...js.environments.jest.globals,
       },
     },
   },
