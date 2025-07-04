@@ -1,18 +1,15 @@
-/* eslint-disable react/destructuring-assignment,react/prop-types,react/jsx-props-no-spreading */
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { render } from '@testing-library/react';
 
 const mockDispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', mockDispatchTrackingEvent);
 
 describe('withTrackingComponentDecorator', () => {
-  // eslint-disable-next-line global-require
   const withTrackingComponentDecorator =
     require('../withTrackingComponentDecorator').default;
 
   it('is a decorator (exports a function, that returns a function)', () => {
     expect(typeof withTrackingComponentDecorator).toBe('function');
-
     const decorated = withTrackingComponentDecorator();
     expect(typeof decorated).toBe('function');
   });
@@ -25,7 +22,6 @@ describe('withTrackingComponentDecorator', () => {
     @withTrackingComponentDecorator({}, { process })
     class ParentTestComponent extends React.Component {
       static displayName = 'ParentTestComponent';
-
       render() {
         return this.props.children;
       }
@@ -34,7 +30,6 @@ describe('withTrackingComponentDecorator', () => {
     @withTrackingComponentDecorator(trackingContext)
     class TestComponent extends React.Component {
       static displayName = 'TestComponent';
-
       render() {
         return null;
       }
@@ -45,12 +40,11 @@ describe('withTrackingComponentDecorator', () => {
     });
 
     it('process function gets called', () => {
-      mount(
+      render(
         <ParentTestComponent {...props}>
           <TestComponent />
         </ParentTestComponent>
       );
-
       expect(process).toHaveBeenCalled();
       expect(mockDispatchTrackingEvent).not.toHaveBeenCalled();
     });
@@ -65,7 +59,6 @@ describe('withTrackingComponentDecorator', () => {
     @withTrackingComponentDecorator({}, { process })
     class ParentTestComponent extends React.Component {
       static displayName = 'ParentTestComponent';
-
       render() {
         return this.props.children;
       }
@@ -74,7 +67,6 @@ describe('withTrackingComponentDecorator', () => {
     @withTrackingComponentDecorator(trackingContext, { dispatchOnMount })
     class TestComponent extends React.Component {
       static displayName = 'TestComponent';
-
       render() {
         return null;
       }
@@ -85,12 +77,11 @@ describe('withTrackingComponentDecorator', () => {
     });
 
     it('dispatches only once when process and dispatchOnMount functions are passed', () => {
-      mount(
+      render(
         <ParentTestComponent {...props}>
           <TestComponent />
         </ParentTestComponent>
       );
-
       expect(process).toHaveBeenCalled();
       expect(dispatchOnMount).toHaveBeenCalled();
       expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
@@ -111,7 +102,6 @@ describe('withTrackingComponentDecorator', () => {
     @withTrackingComponentDecorator({}, { process })
     class ParentTestComponent extends React.Component {
       static displayName = 'ParentTestComponent';
-
       render() {
         return this.props.children;
       }
@@ -120,7 +110,6 @@ describe('withTrackingComponentDecorator', () => {
     @withTrackingComponentDecorator(trackingContext, { dispatchOnMount })
     class TestComponent extends React.Component {
       static displayName = 'TestComponent';
-
       render() {
         return null;
       }
@@ -131,12 +120,11 @@ describe('withTrackingComponentDecorator', () => {
     });
 
     it('dispatches only once when process and dispatchOnMount functions are passed', () => {
-      mount(
+      render(
         <ParentTestComponent>
           <TestComponent {...props} />
         </ParentTestComponent>
       );
-
       expect(process).toHaveBeenCalled();
       expect(dispatchOnMount).toHaveBeenCalled();
       expect(trackingContext).toHaveBeenCalled();
@@ -158,7 +146,6 @@ describe('withTrackingComponentDecorator', () => {
     @withTrackingComponentDecorator({}, { process })
     class ParentTestComponent extends React.Component {
       static displayName = 'ParentTestComponent';
-
       render() {
         return this.props.children;
       }
@@ -167,7 +154,6 @@ describe('withTrackingComponentDecorator', () => {
     @withTrackingComponentDecorator(trackingContext, { dispatchOnMount })
     class TestComponent extends React.Component {
       static displayName = 'TestComponent';
-
       render() {
         return null;
       }
@@ -178,12 +164,11 @@ describe('withTrackingComponentDecorator', () => {
     });
 
     it('dispatches only once when process and dispatchOnMount functions are passed', () => {
-      mount(
+      render(
         <ParentTestComponent {...props}>
           <TestComponent />
         </ParentTestComponent>
       );
-
       expect(process).toHaveBeenCalled();
       expect(mockDispatchTrackingEvent).toHaveBeenCalledWith({
         page: 1,
@@ -196,43 +181,55 @@ describe('withTrackingComponentDecorator', () => {
     const dummyData = { page: 1 };
 
     @withTrackingComponentDecorator(dummyData)
-    class TestComponent {
+    class TestComponent extends React.Component {
       static displayName = 'TestComponent';
+      render() {
+        // Expose tracking prop for assertions
+        return <div data-testid="tracking-prop" {...this.props} />;
+      }
     }
 
-    const component = shallow(<TestComponent />).children();
-
+    let trackingProp;
     beforeEach(() => {
       mockDispatchTrackingEvent.mockClear();
+      render(
+        <TestComponent
+          ref={el => {
+            trackingProp = el;
+          }}
+        />
+      );
     });
 
     it('prop is named tracking and has two keys, trackEvent and getTrackingData', () => {
-      expect(component.props().tracking).toBeDefined();
-      expect(component.props().tracking).toBeInstanceOf(Object);
-      expect(component.props().tracking).toHaveProperty('trackEvent');
-      expect(component.props().tracking).toHaveProperty('getTrackingData');
+      // Access the tracking prop directly via the instance
+      const prop = trackingProp.props.tracking;
+      expect(prop).toBeDefined();
+      expect(prop).toBeInstanceOf(Object);
+      expect(prop).toHaveProperty('trackEvent');
+      expect(prop).toHaveProperty('getTrackingData');
     });
 
     it('prop named trackEvent is a function', () => {
-      expect(component.props().tracking.trackEvent).toBeInstanceOf(Function);
+      const prop = trackingProp.props.tracking;
+      expect(prop.trackEvent).toBeInstanceOf(Function);
     });
 
     it('when trackEvent is called, from props, it will dispatch event in trackEvent', () => {
+      const prop = trackingProp.props.tracking;
       expect(mockDispatchTrackingEvent).not.toHaveBeenCalled();
-      component.props().tracking.trackEvent(dummyData);
+      prop.trackEvent(dummyData);
       expect(mockDispatchTrackingEvent).toHaveBeenCalledWith(dummyData);
     });
 
     it('prop named getTrackingData is a function', () => {
-      expect(component.props().tracking.getTrackingData).toBeInstanceOf(
-        Function
-      );
+      const prop = trackingProp.props.tracking;
+      expect(prop.getTrackingData).toBeInstanceOf(Function);
     });
 
     it('when getTrackingData is called, from props, it will return the data passed to the decorator', () => {
-      expect(component.props().tracking.getTrackingData()).toMatchObject(
-        dummyData
-      );
+      const prop = trackingProp.props.tracking;
+      expect(prop.getTrackingData()).toMatchObject(dummyData);
     });
   });
 
@@ -241,12 +238,14 @@ describe('withTrackingComponentDecorator', () => {
 
     it("should hoist a class's static method when decorated", () => {
       @withTrackingComponentDecorator(dummyData)
-      class StaticComponent {
+      class StaticComponent extends React.Component {
         static someMethod() {
           return 'test';
         }
-
         static someVar = 'test';
+        render() {
+          return null;
+        }
       }
 
       expect(StaticComponent.someMethod).toBeDefined();
@@ -255,12 +254,14 @@ describe('withTrackingComponentDecorator', () => {
     });
 
     it("should hoist a class's static method when wrapped via HoC", () => {
-      class StaticComponent {
+      class StaticComponent extends React.Component {
         static someMethod() {
           return 'test';
         }
-
         static someVar = 'test';
+        render() {
+          return null;
+        }
       }
 
       const DecoratedComponent =

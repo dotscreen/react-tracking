@@ -1,5 +1,4 @@
 describe('trackEventMethodDecorator', () => {
-  // eslint-disable-next-line global-require
   const trackEventMethodDecorator =
     require('../trackEventMethodDecorator').default;
 
@@ -26,7 +25,6 @@ describe('trackEventMethodDecorator', () => {
       }
 
       @trackEventMethodDecorator(trackingData)
-      // eslint-disable-next-line class-methods-use-this
       handleTestEvent(x) {
         spyTestEvent(x);
       }

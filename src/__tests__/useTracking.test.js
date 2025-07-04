@@ -1,6 +1,5 @@
-/* eslint-disable jsx-a11y/control-has-associated-label */
-import { mount } from 'enzyme';
 import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import useTracking from '../useTracking';
 
@@ -46,8 +45,8 @@ describe('useTracking', () => {
       );
     }
 
-    const wrapper = mount(<App />);
-    wrapper.simulate('click');
+    render(<App />);
+    fireEvent.click(screen.getByRole('button'));
     expect(dispatch).toHaveBeenCalledWith({
       ...outerTrackingData,
       event: 'buttonClick',

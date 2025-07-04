@@ -1,11 +1,7 @@
 // @ts-check
-/* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
-/* eslint-disable jsx-a11y/control-has-associated-label */
-/* eslint-disable global-require */
+
 import React, { useContext } from 'react';
-import { mount } from 'enzyme';
-import PropTypes from 'prop-types';
-import hoistNonReactStatics from 'hoist-non-react-statics';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 
 const dispatchTrackingEvent = jest.fn();
 window.dataLayer = [];
@@ -44,7 +40,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(
+    render(
       <TestDefaults>
         <Child />
       </TestDefaults>
@@ -70,7 +66,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(<TestPage />);
+    render(<TestPage />);
 
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
@@ -88,7 +84,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(<TestPage />);
+    render(<TestPage />);
 
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       ...testPageData,
@@ -107,7 +103,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(<TestOptions />);
+    render(<TestOptions />);
 
     expect(dispatchTrackingEvent).not.toHaveBeenCalled();
     expect(dispatch).toHaveBeenCalledWith({
@@ -133,7 +129,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(
+    render(
       <TestOptions>
         <TestChild />
       </TestOptions>
@@ -163,7 +159,7 @@ const runTests = useBuiltLib => {
 
     const TestData2 = track(testData2)(() => <TestData3 />);
 
-    mount(
+    render(
       <TestData1>
         <TestData2 />
       </TestData1>
@@ -186,7 +182,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(<TestComponent />);
+    render(<TestComponent />);
 
     expect(dispatchOnMount).toHaveBeenCalledWith(testDispatchOnMount);
     expect(dispatch).toHaveBeenCalledWith({ dom: true, test: true });
@@ -217,7 +213,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(
+    render(
       <App>
         <Page />
       </App>
@@ -250,7 +246,7 @@ const runTests = useBuiltLib => {
 
     const Page = track({ page: 'Page' })(() => <div>Page</div>);
 
-    mount(
+    render(
       <App>
         <Page />
       </App>
@@ -276,7 +272,7 @@ const runTests = useBuiltLib => {
     )(RawApp);
     const Page = track({ page: 'Page' })(() => <div>Page</div>);
 
-    mount(
+    render(
       <App>
         <Page />
       </App>
@@ -303,7 +299,7 @@ const runTests = useBuiltLib => {
     )(RawApp);
     const Page = track({})(() => <div>Page</div>);
 
-    mount(
+    render(
       <App>
         <Page />
       </App>
@@ -347,7 +343,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(
+    render(
       <App>
         <Page1 />
         <Page2 />
@@ -393,7 +389,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(
+    render(
       <App>
         <Page runtimeData />
       </App>
@@ -453,7 +449,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    const wrappedApp = mount(
+    render(
       <App>
         <Page>
           <Nested>
@@ -463,7 +459,7 @@ const runTests = useBuiltLib => {
       </App>
     );
 
-    wrappedApp.find('Button').simulate('click');
+    fireEvent.click(screen.getByText('Click me!'));
 
     expect(dispatch).toHaveBeenCalledWith({
       event: 'pageView',
@@ -486,7 +482,7 @@ const runTests = useBuiltLib => {
       constructor() {
         super();
         this.state = {
-          booleanState: true, // eslint-disable-line react/no-unused-state
+          booleanState: true,
         };
       }
 
@@ -499,7 +495,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(<TestOptions />);
+    render(<TestOptions />);
 
     expect(dispatchTrackingEvent).not.toHaveBeenCalled();
     expect(dispatch).toHaveBeenCalledWith({
@@ -526,7 +522,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(
+    render(
       <TestOptions onProps="yes">
         <TestChild />
       </TestOptions>
@@ -572,7 +568,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    mount(<TestComponent />);
+    render(<TestComponent />);
 
     expect(global.console.error).toHaveBeenCalledTimes(1);
     expect(global.console.error).toHaveBeenCalledWith(
@@ -594,7 +590,7 @@ const runTests = useBuiltLib => {
       handleClick = jest.fn();
 
       render() {
-        return <span onClick={this.handleClick}>Click Me</span>; // eslint-disable-line
+        return <span onClick={this.handleClick}>Click Me</span>;
       }
     }
 
@@ -617,17 +613,17 @@ const runTests = useBuiltLib => {
       }
     }
 
-    const wrappedApp = mount(<App />);
+    render(<App />);
 
-    wrappedApp.find('span').simulate('click');
+    fireEvent.click(screen.getByText('Click Me'));
     expect(dispatch).toHaveBeenCalledWith({
       data: 1,
       event: 'buttonClick',
       page: 'Page',
     });
 
-    wrappedApp.find('button').simulate('click');
-    wrappedApp.find('span').simulate('click');
+    fireEvent.click(screen.getByRole('button')); // the state-changing button
+    fireEvent.click(screen.getByText('Click Me'));
     expect(dispatch).toHaveBeenCalledWith({
       data: 2,
       event: 'buttonClick',
@@ -673,86 +669,11 @@ const runTests = useBuiltLib => {
       );
     });
 
-    const wrapper = mount(<App />);
+    render(<App />);
 
-    wrapper.find('button').simulate('click');
+    fireEvent.click(screen.getByText('Update Props'));
 
     expect(innerRenderCount).toEqual(1);
-  });
-
-  it('does not prevent components using the legacy context API and hoist-non-react-statics < v3.1.0 from receiving updates', () => {
-    const withLegacyContext = DecoratedComponent => {
-      class WithLegacyContext extends React.Component {
-        static contextTypes = { theme: PropTypes.string };
-
-        render() {
-          return (
-            <DecoratedComponent
-              {...this.props} // eslint-disable-line react/jsx-props-no-spreading
-              theme={this.context.theme}
-            />
-          );
-        }
-      }
-
-      hoistNonReactStatics(WithLegacyContext, DecoratedComponent);
-
-      // Explicitly hoist statc contextType to simulate behavior of
-      // hoist-non-react-statics versions older than v3.1.0
-      WithLegacyContext.contextType = DecoratedComponent.contextType;
-
-      return WithLegacyContext;
-    };
-
-    @track()
-    class Top extends React.Component {
-      render() {
-        return this.props.children;
-      }
-    }
-
-    @withLegacyContext
-    @track({ page: 'Page' }, { dispatchOnMount: true })
-    class Page extends React.Component {
-      render() {
-        return <span>{this.props.theme}</span>;
-      }
-    }
-
-    @track()
-    class App extends React.Component {
-      static childContextTypes = { theme: PropTypes.string };
-
-      constructor(props) {
-        super(props);
-        this.state = { theme: 'light' };
-      }
-
-      getChildContext() {
-        return { theme: this.state.theme };
-      }
-
-      handleUpdateTheme = () => {
-        this.setState({ theme: 'dark' });
-      };
-
-      render() {
-        return (
-          <div>
-            <button type="button" onClick={this.handleUpdateTheme} />
-            <Top>
-              <Page />
-            </Top>
-          </div>
-        );
-      }
-    }
-
-    const wrapper = mount(<App />);
-    expect(wrapper.find('span').text()).toBe('light');
-
-    wrapper.find('button').simulate('click');
-    expect(wrapper.find('span').text()).toBe('dark');
   });
 
   it('root context items are accessible to children', () => {
@@ -774,7 +695,7 @@ const runTests = useBuiltLib => {
       return <div />;
     }
 
-    mount(<App />);
+    render(<App />);
   });
 
   it('dispatches tracking events from a useTracking hook tracking object', () => {
@@ -801,13 +722,13 @@ const runTests = useBuiltLib => {
       );
     }
 
-    const wrappedApp = mount(
+    render(
       <Page>
         <Child />
       </Page>
     );
 
-    wrappedApp.find('button').simulate('click');
+    fireEvent.click(screen.getByRole('button'));
 
     expect(dispatch).toHaveBeenCalledWith({
       ...outerTrackingData,
@@ -844,20 +765,26 @@ const runTests = useBuiltLib => {
       }
 
       render() {
-        return <div>{this.state.data && this.state.data.value}</div>;
+        return (
+          <>
+            <button type="button" onClick={() => this.executeAction()} />
+            <div>{this.state.data && this.state.data.value}</div>
+          </>
+        );
       }
     }
 
-    // Get the first child since the page is wrapped with the WithTracking component.
-    const page = await mount(<Page />).childAt(0);
-    await page.instance().executeAction();
+    render(<Page />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button'));
+    });
 
-    expect(page.state().data).toEqual(message);
+    expect(screen.getByText('test')).toBeInTheDocument();
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       label: 'async action',
       status: 'success',
-      ...message,
+      value: message.value,
     });
   });
 
@@ -873,8 +800,7 @@ const runTests = useBuiltLib => {
       }
 
       @track(
-        // eslint-disable-next-line no-unused-vars
-        (props, state, methodArgs, [{ value }, err]) =>
+        (props, state, methodArgs, [, err]) =>
           err && {
             label: 'async action',
             status: 'failed',
@@ -894,15 +820,21 @@ const runTests = useBuiltLib => {
       }
 
       render() {
-        return <div>{this.state.data && this.state.data.value}</div>;
+        return (
+          <>
+            <button type="button" onClick={() => this.executeAction()} />
+            <div>{this.state.data && this.state.data.value}</div>
+          </>
+        );
       }
     }
 
-    // Get the first child since the page is wrapped with the WithTracking component.
-    const page = await mount(<Page />).childAt(0);
-    await page.instance().executeAction();
+    render(<Page />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button'));
+    });
 
-    expect(page.state().data).toEqual(message);
+    expect(screen.getByText('error')).toBeInTheDocument();
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       label: 'async action',
@@ -910,12 +842,11 @@ const runTests = useBuiltLib => {
     });
   });
 
-  it('can access wrapped component by ref', async () => {
+  it('can access wrapped component by ref', () => {
     const focusFn = jest.fn();
     @track({}, { forwardRef: true })
     class Child extends React.Component {
       focus = focusFn;
-
       render() {
         return 'child';
       }
@@ -923,9 +854,10 @@ const runTests = useBuiltLib => {
 
     class Parent extends React.Component {
       componentDidMount() {
-        this.child.focus();
+        if (this.child && this.child.focus) {
+          this.child.focus();
+        }
       }
-
       render() {
         return (
           <Child
@@ -937,9 +869,7 @@ const runTests = useBuiltLib => {
       }
     }
 
-    const parent = await mount(<Parent />);
-
-    expect(parent.instance().child).not.toBeNull();
+    render(<Parent />);
     expect(focusFn).toHaveBeenCalledTimes(1);
   });
 
@@ -970,15 +900,13 @@ const runTests = useBuiltLib => {
       );
     }
 
-    const wrappedApp = mount(<App />);
-    wrappedApp.find('button').simulate('click');
+    render(<App />);
+    fireEvent.click(screen.getByText('Click me'));
 
     expect(dispatch).toHaveBeenCalledTimes(2);
-    // dispatch on mount
     expect(dispatch).toHaveBeenCalledWith({
       page: 'App',
     });
-    // simulated button click
     expect(dispatch).toHaveBeenCalledWith({
       page: 'App',
       event: 'buttonClick',

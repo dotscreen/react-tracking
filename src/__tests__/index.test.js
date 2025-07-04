@@ -1,29 +1,40 @@
-jest.mock('../withTrackingComponentDecorator');
-jest.mock('../trackEventMethodDecorator');
+import * as exported from '../index';
+import track from '../trackingHoC';
+import withTracking from '../withTrackingComponentDecorator';
+import trackEvent from '../trackEventMethodDecorator';
+import TrackingPropType from '../TrackingPropType';
+import useTracking from '../useTracking';
+import deepmerge from 'deepmerge';
 
-describe('react-tracking', () => {
-  // eslint-disable-next-line global-require
-  const index = require('..');
+describe('index.js', () => {
+  it('should load the index file', () => {
+    expect(exported).toBeDefined();
+  });
+});
 
-  it('exports withTracking', () => {
-    expect(index.withTracking).toBeDefined();
+describe('index.js exports', () => {
+  it('should export track as default and named', () => {
+    expect(exported.default).toBe(track);
+    expect(exported.track).toBe(track);
   });
-  it('exports trackEvent', () => {
-    expect(index.trackEvent).toBeDefined();
+
+  it('should export withTracking', () => {
+    expect(exported.withTracking).toBe(withTracking);
   });
-  it('exports useTracking', () => {
-    expect(index.useTracking).toBeDefined();
+
+  it('should export trackEvent', () => {
+    expect(exported.trackEvent).toBe(trackEvent);
   });
-  it('exports TrackingPropType', () => {
-    expect(index.TrackingPropType).toBeDefined();
+
+  it('should export TrackingPropType', () => {
+    expect(exported.TrackingPropType).toBe(TrackingPropType);
   });
-  it('exports track', () => {
-    expect(index.track).toBeDefined();
+
+  it('should export useTracking', () => {
+    expect(exported.useTracking).toBe(useTracking);
   });
-  it('exports default function', () => {
-    expect(typeof index.default).toBe('function');
-  });
-  it('track and default export are the same', () => {
-    expect(index.track).toBe(index.default);
+
+  it('should export deepmerge', () => {
+    expect(exported.deepmerge).toBe(deepmerge);
   });
 });

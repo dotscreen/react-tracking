@@ -1,4 +1,6 @@
-module.exports = {
-  setupFiles: ['raf/polyfill', './jest.setup.js', './setup/enzymeAdapter.js'],
+export default {
+  setupFilesAfterEnv: ['./jest.setup.js'],
   testEnvironment: 'jsdom',
+  collectCoverage: true,
+  collectCoverageFrom: ['src/**/*.{js,jsx}'],
 };
