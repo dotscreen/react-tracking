@@ -3,8 +3,7 @@
 /* eslint-disable react/destructuring-assignment,react/no-multi-comp,react/prop-types,react/prefer-stateless-function  */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useContext, useEffect, useState } from 'react';
-import { act } from 'react-dom/test-utils';
-import { mount } from 'enzyme';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 
 const dispatchTrackingEvent = jest.fn();
 jest.setMock('../dispatchTrackingEvent', dispatchTrackingEvent);
@@ -39,7 +38,7 @@ describe('hooks', () => {
       return 'hi';
     };
 
-    mount(
+    render(
       <TestDefaults>
         <Child />
       </TestDefaults>
@@ -57,7 +56,7 @@ describe('hooks', () => {
       return null;
     }
 
-    mount(<TestPage />);
+    render(<TestPage />);
 
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       ...testPageData,
@@ -76,7 +75,7 @@ describe('hooks', () => {
       return <div />;
     }
 
-    mount(<TestOptions />);
+    render(<TestOptions />);
 
     expect(dispatchTrackingEvent).not.toHaveBeenCalled();
     expect(dispatch).toHaveBeenCalledWith({
@@ -99,7 +98,7 @@ describe('hooks', () => {
       return <div />;
     }
 
-    mount(
+    render(
       <TestOptions>
         <TestChild />
       </TestOptions>
@@ -146,7 +145,7 @@ describe('hooks', () => {
       );
     }
 
-    mount(
+    render(
       <TestData1>
         <TestData2 />
       </TestData1>
@@ -167,7 +166,7 @@ describe('hooks', () => {
       return null;
     }
 
-    mount(<TestComponent />);
+    render(<TestComponent />);
 
     expect(dispatchOnMount).toHaveBeenCalledWith(testDispatchOnMount);
     expect(dispatch).toHaveBeenCalledWith({ dom: true, test: true });
@@ -196,7 +195,7 @@ describe('hooks', () => {
       return <div>Page</div>;
     }
 
-    mount(
+    render(
       <App>
         <Page />
       </App>
@@ -232,7 +231,7 @@ describe('hooks', () => {
       return <div>Page</div>;
     }
 
-    mount(
+    render(
       <App>
         <Page />
       </App>
@@ -263,7 +262,7 @@ describe('hooks', () => {
       return <div>Page</div>;
     }
 
-    mount(
+    render(
       <App>
         <Page />
       </App>
@@ -295,7 +294,7 @@ describe('hooks', () => {
       return <div>Page</div>;
     }
 
-    mount(
+    render(
       <App>
         <Page />
       </App>
@@ -335,7 +334,7 @@ describe('hooks', () => {
       return <div>Page</div>;
     }
 
-    mount(
+    render(
       <App>
         <Page1 />
         <Page2 />
@@ -379,7 +378,7 @@ describe('hooks', () => {
       return <div>Page</div>;
     }
 
-    mount(
+    render(
       <App>
         <Page runtimeData />
       </App>
@@ -434,7 +433,7 @@ describe('hooks', () => {
       );
     }
 
-    const wrappedApp = mount(
+    render(
       <App>
         <Page>
           <Nested>
@@ -444,7 +443,7 @@ describe('hooks', () => {
       </App>
     );
 
-    wrappedApp.find('Button').simulate('click');
+    fireEvent.click(screen.getByText('Click me!'));
 
     expect(dispatch).toHaveBeenCalledWith({
       event: 'pageView',
@@ -474,7 +473,7 @@ describe('hooks', () => {
       return <div />;
     }
 
-    mount(<TestOptions />);
+    render(<TestOptions />);
 
     expect(dispatchTrackingEvent).not.toHaveBeenCalled();
     expect(dispatch).toHaveBeenCalledWith({
@@ -497,7 +496,7 @@ describe('hooks', () => {
       return 'hi';
     };
 
-    mount(
+    render(
       <TestOptions onProps="yes" child>
         <TestChild />
       </TestOptions>
@@ -547,7 +546,7 @@ describe('hooks', () => {
       );
     }
 
-    mount(<TestComponent />);
+    render(<TestComponent />);
 
     expect(consoleError).toHaveBeenCalledTimes(1);
     expect(consoleError).toHaveBeenCalledWith(
@@ -593,17 +592,17 @@ describe('hooks', () => {
       );
     }
 
-    const wrappedApp = mount(<App />);
+    render(<App />);
 
-    wrappedApp.find('span').simulate('click');
+    fireEvent.click(screen.getByText('Click Me'));
     expect(dispatch).toHaveBeenCalledWith({
       data: 1,
       event: 'buttonClick',
       page: 'Page',
     });
 
-    wrappedApp.find('button').simulate('click');
-    wrappedApp.find('span').simulate('click');
+    fireEvent.click(screen.getByRole('button')); // the state-changing button
+    fireEvent.click(screen.getByText('Click Me'));
     expect(dispatch).toHaveBeenCalledWith({
       data: 2,
       event: 'buttonClick',
@@ -620,7 +619,7 @@ describe('hooks', () => {
       return null;
     }
 
-    mount(<Foo />);
+    render(<Foo />);
   });
 
   it('does not cause unnecessary updates due to context changes', () => {
@@ -677,10 +676,10 @@ describe('hooks', () => {
       );
     }
 
-    const wrapper = mount(<App />);
+    render(<App />);
 
-    wrapper.find('button').simulate('click');
-    wrapper.find('button').simulate('click');
+    fireEvent.click(screen.getByText('Update Props'));
+    fireEvent.click(screen.getByText('Update Props'));
 
     expect(getLatestTrackingData()).toStrictEqual({
       count: 2,
@@ -724,12 +723,12 @@ describe('hooks', () => {
       );
     }
 
-    const wrapper = mount(<App />);
+    render(<App />);
 
-    const button = wrapper.find('button');
-    button.simulate('click');
-    button.simulate('click');
-    button.simulate('click');
+    const button = screen.getByText('Update trackingData and options objects');
+    fireEvent.click(button);
+    fireEvent.click(button);
+    fireEvent.click(button);
 
     expect(trackRenders).toHaveBeenCalledTimes(4);
     expect(dispatch).toHaveBeenCalledTimes(1);
@@ -759,12 +758,12 @@ describe('hooks', () => {
       );
     }
 
-    const wrapper = mount(<App />);
+    const { rerender } = render(<App />);
 
     expect(dispatch).toHaveBeenCalledWith({ data: '' });
 
-    wrapper.setProps({ data: 'Updated data prop' });
-    wrapper.find('button').simulate('click');
+    rerender(<App data="Updated data prop" />);
+    fireEvent.click(screen.getByRole('button'));
 
     expect(dispatch).toHaveBeenCalledTimes(2);
     expect(dispatch).toHaveBeenLastCalledWith({
@@ -808,7 +807,7 @@ describe('hooks', () => {
       );
     }
 
-    mount(
+    render(
       <TestData1>
         <TestData2 />
       </TestData1>
@@ -848,7 +847,7 @@ describe('hooks', () => {
       }
     }
 
-    mount(
+    render(
       <TestData1>
         <TestData2 />
       </TestData1>
@@ -884,7 +883,7 @@ describe('hooks', () => {
       );
     }
 
-    mount(<App />);
+    render(<App />);
   });
 
   it('dispatches tracking events from a useTracking hook tracking object', () => {
@@ -911,13 +910,13 @@ describe('hooks', () => {
       );
     }
 
-    const wrappedApp = mount(
+    render(
       <Page>
         <Child />
       </Page>
     );
 
-    wrappedApp.find('button').simulate('click');
+    fireEvent.click(screen.getByRole('button'));
 
     expect(dispatch).toHaveBeenCalledWith({
       ...outerTrackingData,
@@ -956,12 +955,12 @@ describe('hooks', () => {
       );
     }
 
-    const page = await mount(<Page />);
+    render(<Page />);
     await act(async () => {
-      await page.find('button').simulate('click');
+      fireEvent.click(screen.getByRole('button'));
     });
 
-    expect(page.text()).toEqual(message);
+    expect(screen.getByText(message)).toBeInTheDocument();
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       label: 'async action',
@@ -1001,12 +1000,12 @@ describe('hooks', () => {
       );
     }
 
-    const page = await mount(<Page />);
+    render(<Page />);
     await act(async () => {
-      await page.find('button').simulate('click');
+      fireEvent.click(screen.getByRole('button'));
     });
 
-    expect(page.text()).toEqual(message);
+    expect(screen.getByText(message)).toBeInTheDocument();
     expect(dispatchTrackingEvent).toHaveBeenCalledTimes(1);
     expect(dispatchTrackingEvent).toHaveBeenCalledWith({
       label: 'async action',
