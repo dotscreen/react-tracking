@@ -97,16 +97,16 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^16.3.0",
-    "husky": "^8.0.1",
+    "husky": "^9.1.7",
     "jest": "^30.0.4",
     "jest-environment-jsdom": "^30.0.4",
-    "lint-staged": "^13.0.3",
+    "lint-staged": "^16.1.2",
     "prettier": "^3.6.2",
     "prop-types": "^15.8.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-test-renderer": "^19.1.0",
-    "regenerator-runtime": "^0.13.10"
+    "regenerator-runtime": "^0.14.1"
   },
   "peerDependencies": {
     "prop-types": "^15.x",
